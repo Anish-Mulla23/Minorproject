@@ -1,0 +1,10 @@
+Package	                            Purpose
+
+express	                          Web framework
+mongoose	                        MongoDB ODM
+dotenv	                          Manage environment variables
+bcryptjs                          Hash passwords
+jsonwebtoken	                    Create and verify JWT tokens
+express-async-handler	            Handle errors in async routes easily
+cors	                            Enable cross-origin requests
+nodemon (dev only)	              Auto-restarts server on file changes (for development)

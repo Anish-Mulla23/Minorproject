@@ -1,0 +1,54 @@
+backend/
+│
+├── config/
+│   └── db.js
+│
+├── controllers/
+│   └── userController.js
+│
+├── middleware/
+│   ├── errorMiddleware.js
+│   └── authMiddleware.js
+│
+├── models/
+│   └── userModel.js
+│
+├── routes/
+│   └── userRoutes.js
+│
+├── .env
+├── server.js
+├── package.json
+
+
+
+/my-ecommerce-app
+├── /client                      # React Frontend (Client Side)
+│   ├── /public                  # Public assets (index.html, etc.)
+│   ├── /src
+│   │   ├── /components          # Reusable components (e.g., Navbar, Footer)
+│   │   ├── /context             # Context API (for managing user state)
+│   │   │   └── AuthContext.js   # Authentication context
+│   │   ├── /pages               # Different pages (e.g., Login, Register)
+│   │   │   ├── Login.js         # Login page
+│   │   │   ├── Register.js      # Register page
+│   │   │   └── Home.js          # Home page
+│   │   ├── /services            # Axios calls or API services
+│   │   │   └── authService.js   # Functions to interact with backend authentication API
+│   │   ├── App.js               # Main app component (sets up routing)
+│   │   ├── index.js             # Entry point for the React app
+│   ├── package.json             # React app dependencies
+├── /server                      # Backend (Server Side)
+│   ├── /config                  # Config files (e.g., MongoDB connection, JWT secret)
+│   │   └── db.js                # MongoDB connection setup
+│   ├── /controllers             # Controllers (handling business logic)
+│   │   └── authController.js    # Handle login, register
+│   ├── /models                  # Mongoose models (for MongoDB collections)
+│   │   └── User.js              # User model schema
+│   ├── /routes                  # Express route handlers
+│   │   └── auth.js              # Authentication routes (login, register)
+│   ├── /middleware              # Middleware (e.g., authentication verification)
+│   │   └── authMiddleware.js    # Verify JWT token for protected routes
+│   ├── server.js                # Express app setup and middleware
+│   ├── package.json             # Backend dependencies (Express, MongoDB, etc.)
+└── .env                          # Environment variables (e.g., JWT secret, DB URI)
