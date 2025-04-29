@@ -8,8 +8,15 @@ const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.post("/add", protect, addToWishlist);
-router.post("/remove", protect, removeFromWishlist);
+// ==================== WISHLIST ROUTES ====================
+
+// Add a product to wishlist
+router.put("/add", protect, addToWishlist); // Updated to match the frontend
+
+// Remove a product from wishlist
+router.put("/remove", protect, removeFromWishlist);
+
+// Get the user's wishlist
 router.get("/", protect, getWishlist);
 
 module.exports = router;

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "./AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./register.css";
 
 const Register = () => {
@@ -10,29 +10,66 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (password !== confirmPassword) {
-      alert("Passwords don't match");
+      setErrorMessage("Passwords don't match");
       return;
     }
-    await register({ name, email, password });
-    navigate("/dashboard"); // Redirect to the dashboard on successful registration
+
+    setLoading(true);
+    setErrorMessage("");
+
+    try {
+      await register({ name, email, password });
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Registration error:", error);
+      if (
+        error.message &&
+        error.message.toLowerCase().includes("user already exists")
+      ) {
+        setErrorMessage("User already exists. Please log in instead.");
+      } else {
+        setErrorMessage(error.message || "Registration failed");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <div className="form-container">
+        <h2>Register</h2>
+
+        {errorMessage && (
+          <div className="error-message">
+            {errorMessage}
+            {errorMessage.includes("User already exists") && (
+              <div>
+                <Link to="/login" className="login-link">
+                  Go to Login
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
+
         <div>
           <label>Name:</label>
           <input
-            type="name"
+            type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
           />
         </div>
+
         <div>
           <label>Email:</label>
           <input
@@ -42,6 +79,7 @@ const Register = () => {
             required
           />
         </div>
+
         <div>
           <label>Password:</label>
           <input
@@ -51,6 +89,7 @@ const Register = () => {
             required
           />
         </div>
+
         <div>
           <label>Confirm Password:</label>
           <input
@@ -60,7 +99,10 @@ const Register = () => {
             required
           />
         </div>
-        <button type="submit">Register</button>
+
+        <button type="submit" disabled={loading}>
+          {loading ? "Registering..." : "Register"}
+        </button>
       </div>
     </form>
   );

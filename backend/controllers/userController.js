@@ -1,75 +1,102 @@
-const asyncHandler = require("express-async-handler");
-const User = require("../models/userModel");
+const express = require("express");
+const router = express.Router();
 const jwt = require("jsonwebtoken");
+const User = require("../models/userModel");
 
+// Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "30d",
   });
 };
 
-// @desc    Register new user
-const registerUser = asyncHandler(async (req, res) => {
-  console.log("Received user data:", req.body);
+// ==================== REGISTER ====================
+router.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
-  const userExists = await User.findOne({ email });
 
-  if (userExists) {
-    res.status(400);
-    throw new Error("User already exists");
-  }
+  try {
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: "User registration failed" });
+    }
 
-  const user = await User.create({ name, email, password });
+    // Let the model's pre-save hook handle password hashing
+    const user = await User.create({
+      name,
+      email,
+      password, // Pass raw password, let model hash it
+    });
 
-  if (user) {
     res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
-      isAdmin: user.isAdmin,
       token: generateToken(user._id),
     });
-  } else {
-    res.status(400);
-    throw new Error("Invalid user data");
+  } catch (err) {
+    console.error("Registration error:", err.message);
+    res.status(500).json({ message: "User registration failed" });
   }
 });
 
-// @desc    Login user
-const loginUser = asyncHandler(async (req, res) => {
+// ==================== LOGIN ====================
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
+  try {
+    const user = await User.findOne({ email });
 
-  if (user && (await user.matchPassword(password))) {
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      token: generateToken(user._id),
+    if (!user) {
+      return res.status(401).json({ message: "Authentication failed" });
+    }
+
+    // Use the model's comparePassword method
+    router.post("/login", async (req, res) => {
+      const { email, password } = req.body;
+      
+      console.log("Login attempt for:", email); // Log the email attempting to login
+    
+      try {
+        const user = await User.findOne({ email }).select("+password");
+        
+        if (!user) {
+          console.log("User not found in database");
+          return res.status(401).json({ message: "Authentication failed" });
+        }
+    
+        console.log("Found user:", {
+          id: user._id,
+          email: user.email,
+          passwordHash: user.password.substring(0, 20) + "..." // Log first 20 chars of hash
+        });
+    
+        const isMatch = await user.comparePassword(password);
+        console.log("Password comparison result:", isMatch); // Explicit match result
+    
+        if (!isMatch) {
+          console.log("Password mismatch details:", {
+            inputPasswordLength: password.length,
+            storedHashLength: user.password.length
+          });
+          return res.status(401).json({ message: "Authentication failed" });
+        }
+    
+        const token = generateToken(user._id);
+        console.log("Generated token for user:", user._id);
+        
+        res.json({
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          token,
+        });
+      } catch (err) {
+        console.error("Full login error:", {
+          message: err.message,
+          stack: err.stack
+        });
+        res.status(500).json({ message: "Authentication failed" });
+      }
     });
-  } else {
-    res.status(401);
-    throw new Error("Invalid credentials");
-  }
-});
 
-// @desc    Get user profile
-const getUserProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
-
-  if (user) {
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-    });
-  } else {
-    res.status(404);
-    throw new Error("User not found");
-  }
-});
-
-module.exports = { registerUser, loginUser, getUserProfile };
+module.exports = router;

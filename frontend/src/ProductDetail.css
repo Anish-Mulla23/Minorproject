@@ -2,56 +2,94 @@
   max-width: 1000px;
   margin: 40px auto;
   display: flex;
-  flex-wrap: wrap;
-  gap: 30px;
+  gap: 20px;
   background: #ffffff;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   padding: 30px;
 }
 
-.product-detail img {
-  width: 100%;
-  max-width: 400px;
-  height: 300px; /* Fixed height for consistent look */
+.product-detail-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: nowrap;
+}
+.product-image {
+  width: 100%; /* Make image width flexible */
+  max-width: 400px; /* Set a maximum size to limit the image's width */
+  height: auto; /* Ensure height adjusts based on the width to maintain aspect ratio */
   border-radius: 12px;
-  object-fit: cover; /* This ensures it fills without distortion */
-  object-position: center;
-  flex-shrink: 0;
-  background-color: #f0f0f0; /* fallback background if image fails to load */
+  object-fit: contain; /* Ensures the image fits within the container without distortion */
+  object-position: center; /* Centers the image inside the container */
+  flex-shrink: 0; /* Prevents the image from shrinking */
+  background-color: #f0f0f0; /* Background color if image fails to load */
 }
 
 
-.product-detail .info {
+.info {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 15px;
+  gap: 15px; /* Reduced gap between elements */
 }
 
-.product-detail h2 {
-  font-size: 2rem;
+.product-name {
+  font-size: 1.5rem; /* Reduced font size for compactness */
   margin: 0;
+  font-weight: bold;
 }
 
-.product-detail .category {
+.category {
   color: #777;
   font-weight: 500;
+  font-size: 0.9rem; /* Smaller font size for category */
 }
 
-.product-detail .price {
-  font-size: 1.5rem;
+.price {
+  font-size: 1.1rem; /* Reduced font size for price */
   color: #27ae60;
   font-weight: bold;
 }
 
-.product-detail .description {
-  line-height: 1.6;
-  font-size: 1rem;
+.description {
+  line-height: 1.5; /* Slightly more compact line height */
+  font-size: 0.9rem; /* Smaller font size for description */
   color: #444;
 }
 
-.product-detail p {
+p {
   margin: 4px 0;
+  font-size: 0.9rem; /* Smaller font size for general paragraphs */
+}
+
+.buttons {
+  margin-top: 15px; /* Reduced margin */
+}
+
+.add-to-cart-btn {
+  padding: 10px 18px; /* Smaller button padding */
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem; /* Smaller font size */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #2ecc71;
+}
+
+.back-button {
+  margin-top: 15px; /* Reduced margin for the back button */
+  text-decoration: none;
+  font-weight: bold;
+  color: #3498db;
+  font-size: 0.9rem; /* Smaller font size */
+}
+
+.back-button:hover {
+  text-decoration: underline;
 }

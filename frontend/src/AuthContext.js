@@ -3,9 +3,7 @@ import axios from "axios";
 
 const AuthContext = createContext();
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -17,32 +15,49 @@ export const AuthProvider = ({ children }) => {
         email,
         password,
       });
-      console.log("User registered:", res.data);
+
+      console.log("✅ Registration successful:", res.data);
+
+      const { token, ...userData } = res.data;
+      localStorage.setItem("token", token);
+      setUser(userData);
+      return { success: true, token };
     } catch (error) {
       console.error(
-        "Registration error:",
+        "❌ Registration error:",
         error.response?.data || error.message
       );
-      console.log(name, email, password);
+      throw new Error(
+        error.response?.data?.message ||
+          "Registration failed. Please try again."
+      );
     }
   };
 
-  const login = async (userData) => {
+  const login = async ({ email, password }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/users/login",
-        userData
+      const res = await axios.post("http://localhost:5000/api/users/login", {
+        email,
+        password,
+      });
+
+      console.log("✅ Login successful:", res.data);
+
+      const { token, ...userData } = res.data;
+      localStorage.setItem("token", token);
+      setUser(userData);
+      return { success: true, token };
+    } catch (error) {
+      console.error("❌ Login error:", error.response?.data || error.message);
+      throw new Error(
+        error.response?.data?.message || "Login failed. Please try again."
       );
-      setUser(response.data.user);
-      return true;
-    } catch (err) {
-      console.error("Login error:", err);
-      return false;
     }
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem("token");
   };
 
   return (

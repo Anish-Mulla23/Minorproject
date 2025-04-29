@@ -9,9 +9,10 @@ import { AuthProvider } from "./AuthContext";
 import Login from "./Login";
 import Register from "./Register";
 import Dashboard from "./Dashboard";
-import ProductDetail from "./ProductDetail"; // ✅ Product detail page
-import Wishlist from "./Wishlist"; // ✅ Wishlist page
+import ProductDetail from "./ProductDetail";
+import Wishlist from "./Wishlist";
 import "./index.css";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -22,8 +23,9 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/wishlist" element={<Wishlist />} /> {/* ✅ Added */}
+          <Route path="/wishlist" element={<Wishlist />} />
         </Routes>
       </AuthProvider>
     </Router>

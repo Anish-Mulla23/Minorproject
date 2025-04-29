@@ -8,11 +8,16 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      match: /.+\@.+\..+/,
+      match: /[a-z0-9]+@[a-z]+\.[a-z]{2,3}/,
     },
     password: { type: String, required: true },
     isAdmin: { type: Boolean, default: false },
-    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
     cart: [
       {
         product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
@@ -23,15 +28,22 @@ const userSchema = mongoose.Schema(
   { timestamps: true }
 );
 
+// Hash password before saving - SINGLE VERSION (removed the duplicate)
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) next();
+  if (!this.isModified("password")) return next();
 
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
-userSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+// Add method to compare passwords (essential for login)
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
 };
 
 module.exports = mongoose.model("User", userSchema);
