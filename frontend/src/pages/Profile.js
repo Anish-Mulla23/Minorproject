@@ -5,36 +5,45 @@ import { useNavigate } from "react-router-dom";
 const Profile = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (token) {
-      const fetchUserInfo = async () => {
-        try {
-          const response = await axios.get(
-            "http://localhost:5000/api/profile",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          setUserInfo(response.data); // Assuming the response contains user info
-        } catch (err) {
-          setError("Failed to fetch user information");
-          console.error(err);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchUserInfo();
-    } else {
-      setLoading(false);
+    if (!token) {
       setError("No token found. Please log in.");
+      setLoading(false);
+      return;
     }
+
+    const fetchUserInfo = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/users/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        console.log("User info response:", response.data);
+        setUserInfo(response.data);
+      } catch (err) {
+        console.error(
+          "Error fetching profile:",
+          err.response?.data || err.message
+        );
+        setError(
+          err.response?.data?.message || "Failed to fetch user information"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserInfo();
   }, [token]);
 
   const handleLogout = () => {
@@ -103,9 +112,6 @@ const styles = {
     marginTop: "1rem",
     fontSize: "1.1rem",
     transition: "background-color 0.3s",
-  },
-  logoutBtnHover: {
-    backgroundColor: "#c82333",
   },
   errorText: {
     color: "#dc3545",
