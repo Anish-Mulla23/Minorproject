@@ -1,0 +1,130 @@
+/* General Form Container */
+.form-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 30px;
+  border-radius: 12px;
+  background: #f9f9f9;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fff;
+  transition: all 0.3s ease;
+}
+
+/* Header Styling */
+.form-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Input Fields Styling */
+.form-container input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: 0.2s;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+/* Input Focus Styling */
+.form-container input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+  background-color: #eaf5ff;
+}
+
+/* Submit Button Styling */
+.form-container button {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover and Active State for Button */
+.form-container button:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+.form-container button:active {
+  background-color: #004494;
+  transform: translateY(0);
+}
+
+/* Error Message Styling */
+.form-container .error {
+  color: red;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Link Styling (for login/register links) */
+.form-container .link {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+  color: #007bff;
+  font-weight: 500;
+}
+
+.form-container .link:hover {
+  text-decoration: underline;
+}
+
+/* Animation on Load */
+.form-container {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Keyframes for Fade-In Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .form-container {
+    padding: 20px;
+    margin: 30px auto;
+  }
+
+  .form-container h2 {
+    font-size: 22px;
+  }
+
+  .form-container input {
+    font-size: 14px;
+  }
+
+  .form-container button {
+    font-size: 14px;
+  }
+}

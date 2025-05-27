@@ -1,37 +1,33 @@
 const Product = require("../models/productModel");
+const User = require("../models/userModel");
+const asyncHandler = require("express-async-handler");
 
 // @desc    Get all products
 // @route   GET /api/products
 // @access  Public
-const getProducts = async (req, res) => {
-  try {
-    const products = await Product.find({});
-    res.json(products);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching products" });
-  }
-};
+const getProducts = asyncHandler(async (req, res) => {
+  const products = await Product.find({});
+  res.json(products);
+});
 
 // @desc    Get single product by ID
 // @route   GET /api/products/:id
 // @access  Public
-const getProductById = async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-    if (product) {
-      res.json(product);
-    } else {
-      res.status(404).json({ message: "Product not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching product" });
-  }
-};
+const getProductById = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
 
-// @desc    Update a product
-// @route   PUT /api/products/:id
+  if (!product) {
+    res.status(404);
+    throw new Error("Product not found");
+  }
+
+  res.json(product);
+});
+
+// @desc    Create a product
+// @route   POST /api/products
 // @access  Private/Admin
-const updateProduct = async (req, res) => {
+const createProduct = asyncHandler(async (req, res) => {
   const {
     name,
     description,
@@ -40,111 +36,105 @@ const updateProduct = async (req, res) => {
     stock,
     brand,
     image,
-    rating,
-    numReviews,
     featured,
     warrantyPeriod,
   } = req.body;
 
-  try {
-    const product = await Product.findById(req.params.id);
-
-    if (product) {
-      product.name = name || product.name;
-      product.description = description || product.description;
-      product.price = price || product.price;
-      product.category = category || product.category;
-      product.stock = stock ?? product.stock;
-      product.brand = brand || product.brand;
-      product.image = image || product.image;
-      product.rating = rating || product.rating;
-      product.numReviews = numReviews || product.numReviews;
-      product.featured = featured ?? product.featured;
-      product.warrantyPeriod = warrantyPeriod ?? product.warrantyPeriod;
-
-      const updatedProduct = await product.save();
-      res.json(updatedProduct);
-    } else {
-      res.status(404).json({ message: "Product not found" });
-    }
-  } catch (error) {
-    console.error("Error updating product:", error);
-    res.status(500).json({ message: "Failed to update product" });
+  if (!name || !description || !price || !category || !brand) {
+    res.status(400);
+    throw new Error("Please include all required fields");
   }
-};
+
+  const product = await Product.create({
+    user: req.user._id,
+    name,
+    description,
+    price: Number(price),
+    category,
+    stock: Number(stock) || 0,
+    brand,
+    image: image || "/images/sample.jpg",
+    featured: Boolean(featured),
+    warrantyPeriod: Number(warrantyPeriod) || 0,
+  });
+
+  await User.findByIdAndUpdate(
+    req.user._id,
+    { $push: { productsAdded: product._id } },
+    { new: true }
+  );
+
+  res.status(201).json(product);
+});
+
+// @desc    Update a product
+// @route   PUT /api/products/:id
+// @access  Private/Admin
+const updateProduct = asyncHandler(async (req, res) => {
+  const {
+    name,
+    description,
+    price,
+    category,
+    stock,
+    brand,
+    image,
+    featured,
+    warrantyPeriod,
+  } = req.body;
+
+  const product = await Product.findById(req.params.id);
+
+  if (!product) {
+    res.status(404);
+    throw new Error("Product not found");
+  }
+
+  product.name = name || product.name;
+  product.description = description || product.description;
+  product.price = Number(price) || product.price;
+  product.category = category || product.category;
+  product.stock = Number(stock) ?? product.stock;
+  product.brand = brand || product.brand;
+  product.image = image || product.image;
+  product.featured = Boolean(featured) ?? product.featured;
+  product.warrantyPeriod = Number(warrantyPeriod) ?? product.warrantyPeriod;
+
+  const updatedProduct = await product.save();
+  res.json(updatedProduct);
+});
 
 // @desc    Delete a product
 // @route   DELETE /api/products/:id
 // @access  Private/Admin
-const deleteProduct = async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-
-    if (product) {
-      await product.deleteOne();
-      res.json({ message: "Product removed" });
-    } else {
-      res.status(404).json({ message: "Product not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: "Error deleting product" });
-  }
-};
-
-// @desc    Create a product
-// @route   POST /api/products
+// @desc    Delete a product
+// @route   DELETE /api/products/:id
 // @access  Private/Admin
-const createProduct = async (req, res) => {
-  try {
-    const {
-      name,
-      description,
-      price,
-      category,
-      stock,
-      brand,
-      image,
-      rating,
-      numReviews,
-      featured,
-      warrantyPeriod,
-    } = req.body;
+const deleteProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
 
-    // Validate required fields
-    if (!name || !description || !price || !category || !brand) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
-
-    // Create a new product
-    const product = new Product({
-      name,
-      description,
-      price,
-      category,
-      stock: stock || 0,
-      brand,
-      image: image || "https://example.com/default-image.jpg", // Default image URL
-      rating: rating || 0, // Default to 0 if not provided
-      numReviews: numReviews || 0, // Default to 0 if not provided
-      featured: featured ?? false, // Default to false if not provided
-      warrantyPeriod: warrantyPeriod || 0, // Default to 0 if not provided
-    });
-
-    const savedProduct = await product.save();
-    res.status(201).json(savedProduct);
-  } catch (error) {
-    console.error("Create product error:", error);
-    if (error.name === "ValidationError") {
-      return res.status(400).json({
-        message: "Validation failed",
-        errors: Object.values(error.errors).map((err) => err.message),
-      });
-    }
-    res.status(500).json({ message: "Failed to create product" });
+  if (!product) {
+    res.status(404);
+    throw new Error("Product not found");
   }
-};
 
-// ✅ Export all controller functions
+  // Try to remove the product ID from any user's productsAdded array
+  const users = await User.find({ productsAdded: product._id.toString() });
+
+  for (const user of users) {
+    user.productsAdded = user.productsAdded.filter(
+      (id) => id.toString() !== product._id.toString()
+    );
+    await user.save();
+  }
+
+  await product.deleteOne();
+
+  res.json({
+    message: "Product removed successfully and user data cleaned up",
+  });
+});
+
 module.exports = {
   getProducts,
   getProductById,

@@ -5,28 +5,39 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { AuthProvider } from "./AuthContext";
-import Login from "./Login";
-import Register from "./Register";
+import { AuthProvider } from "./pages/AuthContext";
+import { CartProvider } from "./context/CartContext";
+
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Home from "./pages/Home";
 import Dashboard from "./Dashboard";
-import ProductDetail from "./ProductDetail";
+import ProductDetail from "./components/product/ProductDetail";
 import Wishlist from "./Wishlist";
-import "./index.css";
 import Profile from "./pages/Profile";
+import AdminProductForm from "./components/admin/AdminProductForm";
+import CartPage from "./pages/CartPage";
+
+import "./index.css";
 
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-        </Routes>
+        <CartProvider>
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/Home" element={<Home />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/AdminProductForm" element={<AdminProductForm />} />
+            <Route path="/cart" element={<CartPage />} />
+          </Routes>
+        </CartProvider>
       </AuthProvider>
     </Router>
   );

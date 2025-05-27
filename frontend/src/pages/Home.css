@@ -1,0 +1,68 @@
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(to right, #f8f9fa, #e0f7fa);
+  text-align: center;
+  animation: fadeIn 1s ease-in;
+  padding: 20px;
+}
+
+.home-title {
+  font-size: 4rem; /* Increased from 3rem */
+  font-weight: 800;
+  color: #1e88e5;
+  animation: slideDown 1s ease-out;
+  margin-bottom: 10px;
+}
+
+.highlight {
+  color: #ff4081;
+}
+
+.home-subtitle {
+  font-size: 1.5rem; /* Increased from 1.2rem */
+  margin-top: 15px;
+  color: #555;
+}
+
+.dashboard-btn {
+  margin-top: 40px;
+  padding: 16px 32px; /* Increased padding for a bigger button */
+  font-size: 1.2rem; /* Bigger text */
+  background-color: #1e88e5;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.dashboard-btn:hover {
+  background-color: #1565c0;
+  transform: scale(1.08);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

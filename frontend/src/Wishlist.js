@@ -218,6 +218,9 @@ const Wishlist = () => {
 
   return (
     <div className="wishlist-container">
+      <button className="go-back-button" onClick={() => window.history.back()}>
+        ← Go Back
+      </button>
       <h2>My Wishlist</h2>
 
       {successMessage && (
@@ -227,7 +230,7 @@ const Wishlist = () => {
       {wishlistProducts.length === 0 && !loading ? (
         <div className="empty-wishlist">
           <p>Your wishlist is empty.</p>
-          <button onClick={() => navigate("/products")} className="browse-btn">
+          <button onClick={() => navigate("/dashboard")} className="browse-btn">
             Browse Products
           </button>
         </div>
@@ -239,7 +242,7 @@ const Wishlist = () => {
               {wishlistProducts.length === 1 ? "item" : "items"} in wishlist
             </p>
             <button
-              onClick={() => navigate("/products")}
+              onClick={() => navigate("/Dashboard")}
               className="continue-shopping-btn"
             >
               Continue Shopping
@@ -269,7 +272,7 @@ const Wishlist = () => {
                     {item.description?.substring(0, 100)}...
                   </p>
                   <div className="price-stock">
-                    <p className="price">${item.price?.toFixed(2)}</p>
+                    <p className="price">₹{item.price?.toFixed(2)}</p>
                     {item.stock > 0 ? (
                       <span className="in-stock">In Stock</span>
                     ) : (
@@ -278,17 +281,6 @@ const Wishlist = () => {
                   </div>
 
                   <div className="wishlist-actions">
-                    <button
-                      className="wishlist-action-btn move-to-cart-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        moveToCart(item._id);
-                      }}
-                      disabled={addingToCart[item._id] || item.stock <= 0}
-                    >
-                      {addingToCart[item._id] ? "Moving..." : "Move to Cart"}
-                    </button>
-
                     <button
                       className="wishlist-action-btn add-to-cart-btn"
                       onClick={(e) => {

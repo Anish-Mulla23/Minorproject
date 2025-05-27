@@ -12,6 +12,15 @@ const userSchema = mongoose.Schema(
     },
     password: { type: String, required: true },
     isAdmin: { type: Boolean, default: false },
+
+    // ✅ New section: Products added by this user
+    productsAdded: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
+
     wishlist: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -28,7 +37,7 @@ const userSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-// Hash password before saving - SINGLE VERSION (removed the duplicate)
+// Hash password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
@@ -41,7 +50,7 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// Add method to compare passwords (essential for login)
+// Compare password method
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
