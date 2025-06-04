@@ -17,6 +17,7 @@ import Wishlist from "./Wishlist";
 import Profile from "./pages/Profile";
 import AdminProductForm from "./components/admin/AdminProductForm";
 import CartPage from "./pages/CartPage";
+import BuyNowPage from "./pages/BuyNowPage"; // adjust path as needed
 
 import "./index.css";
 
@@ -36,6 +37,7 @@ function App() {
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/AdminProductForm" element={<AdminProductForm />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/buy-now" element={<BuyNowPage />} />
           </Routes>
         </CartProvider>
       </AuthProvider>

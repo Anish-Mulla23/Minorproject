@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useCart } from "../context/CartContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import "./CartPage.css";
 
 const CartPage = () => {
   const {
@@ -13,7 +14,8 @@ const CartPage = () => {
     clearError,
   } = useCart();
 
-  // Debug cart data on every render
+  const navigate = useNavigate();
+
   useEffect(() => {
     console.log("Cart data:", cart);
   }, [cart]);
@@ -21,6 +23,13 @@ const CartPage = () => {
   const handleQuantityChange = (productId, newQuantity) => {
     if (newQuantity < 1) return;
     updateCartItem(productId, newQuantity);
+  };
+
+  // Buy Now handler to buy a single product immediately
+  const handleBuyNow = (productId, quantity) => {
+    navigate("/buy-now", {
+      state: { singleProduct: { productId, quantity } },
+    });
   };
 
   if (loading && cart.length === 0) {
@@ -42,7 +51,7 @@ const CartPage = () => {
       {cart.length === 0 ? (
         <div className="empty-cart">
           <p>Your cart is empty</p>
-          <Link to="/products" className="btn">
+          <Link to="/Dashboard" className="btn">
             Continue Shopping
           </Link>
         </div>
@@ -50,7 +59,6 @@ const CartPage = () => {
         <div className="cart-content">
           <div className="cart-items">
             {cart.map((item) => {
-              // Defensive check: if product info missing, skip rendering this item
               if (!item.product) return null;
 
               const { _id, image, name, price } = item.product;
@@ -61,7 +69,7 @@ const CartPage = () => {
                   </div>
                   <div className="item-details">
                     <h3>{name}</h3>
-                    <p>${price.toFixed(2)}</p>
+                    <p>₹{price.toFixed(2)}</p>
                     <div className="quantity-control">
                       <button
                         onClick={() =>
@@ -86,9 +94,17 @@ const CartPage = () => {
                     >
                       Remove
                     </button>
+                    {/* Buy Now Button */}
+                    <button
+                      className="buy-now-btn"
+                      onClick={() => handleBuyNow(_id, item.quantity)}
+                      style={{ marginLeft: "10px" }}
+                    >
+                      Buy Now
+                    </button>
                   </div>
                   <div className="item-total">
-                    ${(price * item.quantity).toFixed(2)}
+                    ₹{(price * item.quantity).toFixed(2)}
                   </div>
                 </div>
               );
@@ -99,7 +115,7 @@ const CartPage = () => {
             <h2>Order Summary</h2>
             <div className="summary-row">
               <span>Subtotal</span>
-              <span>${Number(cartTotal).toFixed(2)}</span>
+              <span>₹{Number(cartTotal).toFixed(2)}</span>
             </div>
             <div className="summary-row">
               <span>Shipping</span>
@@ -107,7 +123,7 @@ const CartPage = () => {
             </div>
             <div className="summary-row total">
               <span>Total</span>
-              <span>${Number(cartTotal).toFixed(2)}</span>
+              <span>₹{Number(cartTotal).toFixed(2)}</span>
             </div>
             <Link to="/checkout" className="btn checkout-btn">
               Proceed to Checkout

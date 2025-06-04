@@ -148,6 +148,7 @@ const ProductDashboard = () => {
         );
         setCart((prev) => [...prev, productId]);
         setSuccessMessage("Added to cart");
+        window.location.reload();
       }
     } catch (err) {
       console.error("Error updating cart:", err);
@@ -243,11 +244,10 @@ const ProductDashboard = () => {
               Wishlist ({wishlist.length})
             </button>
           </Link>
-
-          <Link to="/CartPage">
-            <button className="icon-btn">
-              <FaShoppingCart />
-              Cart ({cart.length})
+          <Link to="/cart" style={{ textDecoration: "none" }}>
+            <button className="icon-btn" title="Go to Cart">
+              <FaShoppingCart style={{ marginRight: "5px" }} />
+              Cart <span>({cart.length})</span>
             </button>
           </Link>
 
@@ -299,7 +299,7 @@ const ProductDashboard = () => {
                 />
                 <h2>{product.name}</h2>
                 <p>Category: {product.category}</p>
-                <p>Price: ${product.price.toFixed(2)}</p>
+                <p>Price: ₹{product.price.toFixed(2)}</p>
                 <p>Rating: {product.rating.toFixed(1)}</p>
 
                 <div className="product-actions">

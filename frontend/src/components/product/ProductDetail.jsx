@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ProductDetail.css";
 
@@ -41,7 +41,7 @@ const ProductDetail = () => {
       setLoading(true);
 
       await axios.post(
-        "http://localhost:5000/api/cart/add", // Make sure your backend has this route
+        "http://localhost:5000/api/cart/add",
         { productId: id, quantity: 1 },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -58,8 +58,7 @@ const ProductDetail = () => {
   };
 
   const handleBuyNow = () => {
-    // You can navigate to checkout page directly
-    navigate(`/checkout/${id}`);
+    navigate("/buy-now");
   };
 
   if (error) return <p>{error}</p>;
@@ -106,7 +105,6 @@ const ProductDetail = () => {
             {new Date(product.updatedAt).toLocaleDateString("en-IN")}
           </p>
 
-          {/* Buttons */}
           <div className="buttons">
             <button
               onClick={handleAddToCart}

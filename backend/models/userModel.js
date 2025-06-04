@@ -12,6 +12,10 @@ const userSchema = mongoose.Schema(
     },
     password: { type: String, required: true },
     isAdmin: { type: Boolean, default: false },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
 
     // ✅ New section: Products added by this user
     productsAdded: [

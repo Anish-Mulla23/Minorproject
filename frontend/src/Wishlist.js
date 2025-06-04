@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+
 import "./Wishlist.css";
 
 const Wishlist = () => {
@@ -15,18 +16,16 @@ const Wishlist = () => {
   // Clear success message after 3 seconds
   useEffect(() => {
     if (successMessage) {
-      const timer = setTimeout(() => {
-        setSuccessMessage("");
-      }, 3000);
+      const timer = setTimeout(() => setSuccessMessage(""), 3000);
       return () => clearTimeout(timer);
     }
   }, [successMessage]);
 
+  // Fetch wishlist products
   const fetchWishlist = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
-
       const token = localStorage.getItem("token");
       if (!token) {
         setError("You must be logged in to view your wishlist.");
@@ -36,23 +35,21 @@ const Wishlist = () => {
       }
 
       const response = await axios.get("http://localhost:5000/api/wishlist/", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       const wishlistItems = response.data?.wishlist || [];
       let products = [];
 
       if (wishlistItems.length > 0) {
+        // Check if wishlist items are full product objects or just product IDs
         if (typeof wishlistItems[0] === "object" && wishlistItems[0]._id) {
-          // Backend returns full products
           products = wishlistItems.map((item) => ({
             ...item,
             inWishlist: true,
           }));
         } else {
-          // Backend returns IDs - fetch product details
+          // If just IDs, fetch each product detail
           const productDetails = await Promise.all(
             wishlistItems.map(async (productId) => {
               try {
@@ -72,26 +69,20 @@ const Wishlist = () => {
 
       setWishlistProducts(products);
     } catch (err) {
-      console.error("Error fetching wishlist:", err);
-      setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Failed to fetch wishlist. Please try again."
-      );
-      if (err.response?.status === 401) {
-        navigate("/login");
-      }
+      setError(err.response?.data?.message || err.message);
+      if (err.response?.status === 401) navigate("/login");
     } finally {
       setLoading(false);
     }
   }, [navigate]);
 
+  // Remove product from wishlist
   const removeFromWishlist = async (productId) => {
     try {
       setRemoving((prev) => ({ ...prev, [productId]: true }));
       const token = localStorage.getItem("token");
 
-      // Optimistic UI update
+      // Optimistically update UI
       setWishlistProducts((prev) =>
         prev.filter((item) => item._id !== productId)
       );
@@ -99,27 +90,21 @@ const Wishlist = () => {
       await axios.put(
         "http://localhost:5000/api/wishlist/remove",
         { productId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setSuccessMessage("Item removed from wishlist");
     } catch (err) {
       console.error("Error removing from wishlist:", err);
-      setError(
-        err.response?.data?.message ||
-          "Failed to remove item. Please try again."
-      );
-      // Re-fetch to ensure consistency
+      setError(err.response?.data?.message || "Failed to remove item.");
+      // Re-fetch wishlist if removal failed
       fetchWishlist();
     } finally {
       setRemoving((prev) => ({ ...prev, [productId]: false }));
     }
   };
 
+  // Add product to cart
   const addToCart = async (productId) => {
     try {
       setAddingToCart((prev) => ({ ...prev, [productId]: true }));
@@ -128,77 +113,31 @@ const Wishlist = () => {
       await axios.post(
         "http://localhost:5000/api/cart/",
         { productId, quantity: 1 },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setSuccessMessage("Item added to cart successfully");
     } catch (err) {
-      console.error("Error adding to cart:", err);
-      setError(
-        err.response?.data?.message ||
-          "Failed to add item to cart. Please try again."
-      );
-      if (err.response?.status === 401) {
-        navigate("/login");
-      }
+      setError(err.response?.data?.message || "Failed to add item to cart.");
+      if (err.response?.status === 401) navigate("/login");
     } finally {
       setAddingToCart((prev) => ({ ...prev, [productId]: false }));
     }
   };
 
-  const moveToCart = async (productId) => {
-    try {
-      setAddingToCart((prev) => ({ ...prev, [productId]: true }));
-      const token = localStorage.getItem("token");
-
-      // Optimistic UI update
-      setWishlistProducts((prev) =>
-        prev.filter((item) => item._id !== productId)
-      );
-
-      // Remove from wishlist
-      await axios.put(
-        "http://localhost:5000/api/wishlist/remove",
-        { productId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setSuccessMessage("Item moved to cart successfully");
-    } catch (err) {
-      console.error("Error moving to cart:", err);
-      setError(
-        err.response?.data?.message ||
-          "Failed to move item to cart. Please try again."
-      );
-      // Re-fetch to ensure consistency
-      fetchWishlist();
-      if (err.response?.status === 401) {
-        navigate("/login");
-      }
-    } finally {
-      setAddingToCart((prev) => ({ ...prev, [productId]: false }));
-    }
-  };
-
+  // Fetch wishlist on component mount
   useEffect(() => {
     fetchWishlist();
   }, [fetchWishlist]);
 
+  // Handle clicking product card but ignore clicks on buttons
   const handleProductClick = (productId, e) => {
-    // Prevent navigation if clicking on buttons
-    if (e.target.closest(".wishlist-action-btn")) return;
+    if (e.target.closest(".wishlist-action-btn")) return; // Prevent navigation if clicked on a button
     navigate(`/product/${productId}`);
   };
 
   if (loading) return <div className="loading">Loading wishlist...</div>;
+
   if (error)
     return (
       <div className="error-message">
@@ -227,7 +166,7 @@ const Wishlist = () => {
         <div className="success-message">{successMessage}</div>
       )}
 
-      {wishlistProducts.length === 0 && !loading ? (
+      {wishlistProducts.length === 0 ? (
         <div className="empty-wishlist">
           <p>Your wishlist is empty.</p>
           <button onClick={() => navigate("/dashboard")} className="browse-btn">
@@ -242,7 +181,7 @@ const Wishlist = () => {
               {wishlistProducts.length === 1 ? "item" : "items"} in wishlist
             </p>
             <button
-              onClick={() => navigate("/Dashboard")}
+              onClick={() => navigate("/dashboard")}
               className="continue-shopping-btn"
             >
               Continue Shopping

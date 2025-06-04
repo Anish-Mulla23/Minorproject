@@ -164,7 +164,7 @@ const Profile = () => {
                           {product.name}
                         </strong>
                         <p style={styles.productPrice}>
-                          ${product.price.toFixed(2)}
+                          ₹{product.price.toFixed(2)}
                         </p>
                         <p style={styles.productCategory}>{product.category}</p>
                       </div>
